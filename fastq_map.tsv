@@ -9,5 +9,3 @@ Sample09	0	r1	1	test_data/fastq/Sample09_1.fastq.gz
 Sample09	0	r1	2	test_data/fastq/Sample09_2.fastq.gz
 Sample10	0	r1	1	test_data/fastq/Sample10_1.fastq.gz
 Sample10	0	r1	2	test_data/fastq/Sample10_2.fastq.gz
-Sample10	0	r2	1	test_data/fastq/Sample10_1.fastq.gz
-Sample10	0	r2	2	test_data/fastq/Sample10_2.fastq.gz

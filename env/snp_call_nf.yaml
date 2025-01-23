@@ -1,9 +1,12 @@
-name: snp_call_nf 
+name: withMultiq_snp_call_nf 
 channels:
   - conda-forge
   - bioconda
   - defaults
 dependencies:
+  - trimmomatic=0.39
+  - fastqc=0.12.1
+  - multiqc=1.26
   - bowtie2=2.4.4
   - gatk4=4.2.2.0
   - bedtools=2.30.0

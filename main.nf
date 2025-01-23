@@ -17,6 +17,62 @@ gvcf_only:\t${params.gvcf_only}
 =============================================================""")
 }
 
+process FASTQC {
+    tag "$meta.Sample~$meta.Run"
+    publishDir "$params.outdir/fastqc", pattern: "*zip"
+   // publishDir "$params.outdir/fastqc", pattern: "*html"
+    input:
+    tuple val(meta), path(fastq)
+    output: 
+    //tuple val(meta), path("*.html"),             emit: html
+    path("*.zip"),             emit: zip
+    """
+    if [[ $meta.is_paired == 1 ]]
+    then
+    	fastqc ${fastq[0]}
+    	fastqc ${fastq[1]}
+    else
+    	fastqc ${fastq}
+    fi
+    """
+}
+
+process MULTIQC { 
+
+    publishDir "$params.outdir/multiqc", pattern: "*html"
+    input:
+    path(zip) 
+    //tuple val(meta), path(zip) 
+    output:
+    file "multiqc_report.html"
+    file "multiqc_data"
+    """
+    multiqc .
+    """
+}
+process TRIMMOMATIC {
+    tag "$meta.Sample~$meta.Run"
+    publishDir "$params.outdir/trimmed", pattern: "*fq.gz"
+    input:
+    tuple val(meta), path(fastq)
+    output:
+    tuple val(meta), path("*.fq.gz"),             emit: fq
+    shell:
+    def reads = meta.is_paired == 1 ? "${fastq[0]} ${fastq[1]}" : "$fastq"
+    """
+    if [[ $meta.is_paired == 1 ]] 
+    then
+   	 trimmomatic PE ${reads} \
+P_${meta.Sample}~${meta.Run}_r1.fq.gz \
+U_${meta.Sample}~${meta.Run}_r1.fq.gz \
+P_${meta.Sample}~${meta.Run}_r2.fq.gz \
+U_${meta.Sample}~${meta.Run}_r2.fq.gz ILLUMINACLIP:/home/anagel4/scr4-jcarlto6/adapters.fasta:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:70 HEADCROP:1 AVGQUAL:28
+     else 
+	trimmomatic SE ${reads} trim_${meta.Sample}~${meta.Run}.fq.gz ILLUMINACLIP:/home/anagel4/Trimmomatic-0.39/adapters/NexteraPE-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+    fi 
+    """
+}
+
 process BOWTIE2_ALIGN_TO_HOST {
     tag "$meta.Sample~$meta.Run"
     publishDir "$params.outdir/flagstat_host", pattern: "*.flagstat"
@@ -465,7 +521,8 @@ workflow {
         } 
 
     // Remove reads mapped to host and split unmapped to fastq files
-    input_ch |  BOWTIE2_ALIGN_TO_HOST
+    input_ch | FASTQC  | collect  | MULTIQC
+    input_ch | TRIMMOMATIC | BOWTIE2_ALIGN_TO_HOST
     BOWTIE2_ALIGN_TO_HOST.out.bam  | SAMTOOLS_VIEW_RM_HOST_READS | SAMTOOLS_FASTQ
 
     // Align to parasite genome
