@@ -1,5 +1,9 @@
 # snp_call_nf 
 
+This pipeline is modified from https://github.com/bguo068/snp_call_nf/tree/main . 
+It now includes running trimmomatic, fastqc, and multiqc. Some directions have been 
+modified to run on the Rockfish cluster at JHU. 
+
 The pipeline is designed to perform joint variant calling on large Plasmodium
 Whole Genome Sequencing (WGS) datasets. It follows `GATK` best practices and the
 [MalariaGEN Pf6 data-generating
@@ -23,7 +27,7 @@ files for *Plasmodium vivax* under development and can be checked with the
 [link](https://github.com/bguo068/snp_call_nf/tree/vivax).
 
 
-# Software environtment
+# Software environment
 
 The pipeline has been tested on MacOS and Linux system. The software
 dependencies (including the version numbers of used software) are defined within the
@@ -35,11 +39,20 @@ The estimated time of instation is about 5-20 minutes.
 files. Git clone the pipeline and change directory to the pipeline folder
 ```sh
 cd YOUR_WORKING_DIR # replace `YOUR_WORKING_DIR` with your real path
-git clone https://github.com/bguo068/snp_call_nf.git
+git clone https://github.com/nage0178/snp_call_nf.git
 cd snp_call_nf
 ```
-2. Install conda from [here](https://docs.conda.io/en/latest/miniconda.html) if you have not
-3. Install the `nf` and the `snp_call_nf` conda environments
+2. Install conda from [here](https://docs.conda.io/en/latest/miniconda.html) if you have not. On Rockfish
+```
+module load anaconda
+```
+3. Configure conda.
+```
+conda config --add channels bioconda
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+```
+4. Install the `nf` and the `snp_call_nf` conda environments
 ```sh
 # NOTE: The nextflow engine and the pipeline may need different version of java.
 # We use two different Conda environments to address the conflict.
@@ -114,6 +127,7 @@ this option, you can specify `--vqsr true` to the nextflow command line
     - `result/coverage`: read converage based on the analysis-ready bam files 
     - `result/flagstat`: bam flatstat based on the analysis-ready bam files 
     - `result/gvcf`: single-sample vcf files
+    - `result/multiqc_report.html`: Summary of untrimmed sequence files
     - `result/hardfilt`: multiple-sample (joint-call) vcf files with hard filterating annotations
     - `result/vqsrfilt`: multiple-sample (joint-call) vcf files with vqsr-based filterating annotations.
    You can decide to use one of these, `result/hardfilt` and `result/vqsrfilt`.
