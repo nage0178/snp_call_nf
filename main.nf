@@ -66,9 +66,9 @@ process TRIMMOMATIC {
 P_${meta.Sample}~${meta.Run}_r1.fq.gz \
 U_${meta.Sample}~${meta.Run}_r1.fq.gz \
 P_${meta.Sample}~${meta.Run}_r2.fq.gz \
-U_${meta.Sample}~${meta.Run}_r2.fq.gz ILLUMINACLIP:/home/anagel4/scr4-jcarlto6/adapters.fasta:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:70 HEADCROP:1 AVGQUAL:28
+U_${meta.Sample}~${meta.Run}_r2.fq.gz ILLUMINACLIP:ref/adapters.fasta:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:70 HEADCROP:1 AVGQUAL:28
      else 
-	trimmomatic SE ${reads} trim_${meta.Sample}~${meta.Run}.fq.gz ILLUMINACLIP:/home/anagel4/Trimmomatic-0.39/adapters/NexteraPE-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+	trimmomatic SE ${reads} trim_${meta.Sample}~${meta.Run}.fq.gz ILLUMINACLIP:ref/adapters.fasta:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
     fi 
     """
 }
